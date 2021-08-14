@@ -1,15 +1,37 @@
+#Clone Project
+
+This project use godot-cpp project as submodule.
+
+`git clone --recursive https://github.com/nongvantinh/godot-gdnative.git`
+
+if you forgot to add ***--recursive*** when clone project then you must run command:
+
+`git submodule update --init --recursive`
+
+
+#Build project
+
+First navigate to godot-cpp folder, and build cpp binding from there this, you only needs to do this once.
+
+```
+cd godot-cpp
+scons generate_bindings=yes -j16 platform=windows 
+scons generate_bindings=yes -j16 platform=linux 
+scons generate_bindings=yes -j16 platform=freebsd 
+scons generate_bindings=yes -j16 platform=osx
+scons generate_bindings=yes -j16 platform=ios
+scons generate_bindings=yes -j16 platform=javascript
+
+scons generate_bindings=yes -j16 platform=android android_arch=armv7
+scons generate_bindings=yes -j16 platform=android android_arch=arm64v8
 scons generate_bindings=yes -j16 platform=android android_arch=x86
-`build for android: armv7a:`
+scons generate_bindings=yes -j16 platform=android android_arch=x86_64
 
-armv7a-linux-androideabi21-clang++ -fPIC -o src/init.o -c src/init.cpp -g -O3 -std=c++14 -Igodot-cpp/include -Igodot-cpp/include/core -Igodot-cpp/include/gen -Igodot-cpp/godot-headers
-armv7a-linux-androideabi21-clang++ -o bin/libgodot-cpp.android.armv7.so -shared src/init.o -Lgodot-cpp/bin -lgodot-cpp.android.debug.armv7
+```
 
-`build for android: arm64v8:`
+- the above command is for copy and paste purpose, you can only compile for host platform. Cross-comppile is not support.
+- You can compile for android if you are using host: ***windows***, ***linux***, ***osx*** and android ndk must installed and add it to path variable with name ***ANDROID_NDK_ROOT***
+or pass it when you calling scons:
+`scons generate_bindings=yes -j16 platform=android android_arch=armv7 ANDROID_NDK_ROOT="/PATH-TO-ANDROID-NDK/" `
 
-aarch64-linux-android29-clang++  -fPIC -o src/init.o -c src/init.cpp -g -O3 -std=c++14 -Igodot-cpp/include -Igodot-cpp/include/core -Igodot-cpp/include/gen -Igodot-cpp/godot-headers
-aarch64-linux-android29-clang++  -o bin/libgodot-cpp.android.arm64v8.so -shared src/init.o -Lgodot-cpp/bin -lgodot-cpp.android.debug.arm64v8
-
-`windows:`
-
-cl /Fosrc/init.obj /c src/init.cpp /nologo -EHsc -DNDEBUG /MDd /Igodot-cpp\include /Igodot-cpp\include\core /Igodot-cpp\include\gen /Igodot-cpp\godot-headers
-link /nologo /dll /out:bin\libgodot-cpp.windows.dll /implib:bin\libgodot-cpp.windows.lib src\init.obj godot-cpp\bin\libgodot-cpp.windows.debug.64.lib
+run ***scons -h*** or look at SConstruct file for more information.
