@@ -370,7 +370,7 @@ elif env['platform'] == 'android':
 
     env.Append(CCFLAGS=['--target=' + arch_info['target'] + env['android_api_level'], '-march=' + arch_info['march'], '-fPIC'])#, '-fPIE', '-fno-addrsig', '-Oz'])
     env.Append(CCFLAGS=arch_info['ccflags'])
-
+    env.Append(SHLINKFLAGS=['--target=' + arch_info['target'] + env['android_api_level'], '-march=' + arch_info['march']])
     if env['target'] == 'debug':
         env.Append(CCFLAGS=['-Og', '-g'])
     elif env['target'] == 'release':
