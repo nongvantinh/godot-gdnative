@@ -309,8 +309,12 @@ elif env['platform'] == 'windows':
 elif env['platform'] == 'android':
     if host_platform == 'windows':
         # Don't Clone the environment. Because otherwise, SCons will pick up msvc stuff.
-        env = Environment(ENV = os.environ, tools=["mingw"])
+        env = Environment(ENV = os.environ, tools=["mingw"], SHLIBSUFFIX=".so")
         opts.Update(env)
+        dict = env.Dictionary()
+        keys = dict.keys()
+        for key in keys:
+            print ("construction variable = '%s', value = '%s'" % (key, dict[key]))
         #env = env.Clone(tools=['mingw'])
 
         env["SPAWN"] = mySpawn
@@ -427,7 +431,7 @@ add_sources(sources, 'src', 'cpp')
 
 library = env.SharedLibrary(
     target='demo/bin/{}_{}/'.format(env['platform'], arch_suffix)
-    + 'libgdnative.{}.{}'.format(env['platform'], arch_suffix
+    + 'libgdnative.{}.{}{}'.format(env['platform'], arch_suffix, env['SHLIBSUFFIX']
     ), source=sources
 )
 Default(library)
