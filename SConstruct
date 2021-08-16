@@ -4,6 +4,8 @@ import os
 import sys
 import subprocess
 
+import SCons.Util
+
 if sys.version_info < (3,):
     def decode_utf8(x):
         return x
@@ -307,17 +309,13 @@ elif env['platform'] == 'windows':
         ])
 
 elif env['platform'] == 'android':
-    if host_platform == 'windows':
-        # Don't Clone the environment. Because otherwise, SCons will pick up msvc stuff.
-        env = Environment(ENV = os.environ, tools=["mingw"], SHLIBSUFFIX=".so")
-        opts.Update(env)
-        dict = env.Dictionary()
-        keys = dict.keys()
-        for key in keys:
-            print ("construction variable = '%s', value = '%s'" % (key, dict[key]))
-        #env = env.Clone(tools=['mingw'])
-
-        env["SPAWN"] = mySpawn
+    # Don't Clone the environment. Because otherwise, SCons will pick up msvc stuff.
+    env = Environment(ENV = os.environ, tools=['clang', 'clang++', 'gcc', 'g++', 'gnulink', 'ar', 'gas', 'gfortran', 'm4'])
+    opts.Update(env)
+    # dict = env.Dictionary()
+    # keys = dict.keys()
+    # for key in keys:
+    #     print ("construction variable = '%s', value = '%s'" % (key, dict[key]))
 
     # Verify NDK root
     if not 'ANDROID_NDK_ROOT' in env:
@@ -364,13 +362,25 @@ elif env['platform'] == 'android':
     arch_info = arch_info_table[env['android_arch']]
 
     # Setup tools
-    env['CC'] = toolchain + "/bin/clang"
-    env['CXX'] = toolchain + "/bin/clang++"
-    env['AR'] = toolchain + "/bin/" + arch_info['tool_path'] + "-ar"
+    env['CC'] = toolchain + '/bin/{}{}-clang'.format(arch_info['target'], env['android_api_level'])
+    env['CXX'] = toolchain + '/bin/{}{}-clang++'.format(arch_info['target'], env['android_api_level'])
+    env['AR'] = toolchain + '/bin/{}-ar'.format(arch_info['tool_path'])
+    env['OBJSUFFIX'] = '.o'
+    env['SHOBJSUFFIX'] = SCons.Util.CLVar('$OBJSUFFIX')
+    env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME'] = 1
+    # Specify compiler flags.
+    env['_LIBDIRFLAGS'] = SCons.Util.CLVar(
+        ['${_concat(LIBDIRPREFIX, LIBPATH, LIBDIRSUFFIX, __env__, RDirs, TARGET, SOURCE)}'])
 
-    env.Append(CCFLAGS=['--target=' + arch_info['target'] + env['android_api_level'], '-march=' + arch_info['march'], '-fPIC'])#, '-fPIE', '-fno-addrsig', '-Oz'])
+    env['LIBPREFIX'] = 'lib'
+    env['LIBSUFFIX'] = '.a'
+
+    env['SHLIBPREFIX'] = 'lib'
+    env['SHLIBSUFFIX'] = '.so'
+
+    env['PROGSUFFIX'] = '.apk'
+    env.Append(CCFLAGS=['-fPIC'])#, '-fPIE', '-fno-addrsig', '-Oz'])
     env.Append(CCFLAGS=arch_info['ccflags'])
-    env.Append(SHLINKFLAGS=['--target=' + arch_info['target'] + env['android_api_level'], '-march=' + arch_info['march']])
     if env['target'] == 'debug':
         env.Append(CCFLAGS=['-Og', '-g'])
     elif env['target'] == 'release':
