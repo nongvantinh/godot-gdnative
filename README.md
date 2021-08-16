@@ -28,6 +28,21 @@ scons generate_bindings=yes -j16 platform=android android_arch=arm64v8
 scons generate_bindings=yes -j16 platform=android android_arch=x86
 scons generate_bindings=yes -j16 platform=android android_arch=x86_64
 
+cd ..
+
+scons -j16 platform=windows 
+scons -j16 platform=linux 
+scons -j16 platform=freebsd 
+scons -j16 platform=osx
+scons -j16 platform=ios
+scons -j16 platform=javascript
+
+scons -j16 platform=android android_arch=armv7
+scons -j16 platform=android android_arch=arm64v8
+scons -j16 platform=android android_arch=x86
+scons -j16 platform=android android_arch=x86_64
+
+
 ```
 
 - the command above is for copy and paste purpose, you can only compile for host platform. ***Cross-comppile is not support***.
