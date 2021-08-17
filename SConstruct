@@ -156,7 +156,7 @@ opts.Add(
 opts.Add(
     'android_api_level',
     'Target Android API level',
-    '18' if ARGUMENTS.get("android_arch", 'armv7') in ['armv7', 'x86'] else '21'
+    '19' if ARGUMENTS.get("android_arch", 'armv7') in ['armv7', 'x86'] else '21'
 )
 opts.Add(
     'ANDROID_NDK_ROOT',
@@ -312,10 +312,6 @@ elif env['platform'] == 'android':
     # Don't Clone the environment. Because otherwise, SCons will pick up msvc stuff.
     env = Environment(ENV = os.environ, tools=['clang', 'clang++', 'gcc', 'g++', 'gnulink', 'ar', 'gas', 'gfortran', 'm4'])
     opts.Update(env)
-    # dict = env.Dictionary()
-    # keys = dict.keys()
-    # for key in keys:
-    #     print ("construction variable = '%s', value = '%s'" % (key, dict[key]))
 
     # Verify NDK root
     if not 'ANDROID_NDK_ROOT' in env:
@@ -365,6 +361,11 @@ elif env['platform'] == 'android':
     env['CC'] = toolchain + '/bin/{}{}-clang'.format(arch_info['target'], env['android_api_level'])
     env['CXX'] = toolchain + '/bin/{}{}-clang++'.format(arch_info['target'], env['android_api_level'])
     env['AR'] = toolchain + '/bin/{}-ar'.format(arch_info['tool_path'])
+    env['AS'] = SCons.Util.CLVar('$CC')
+    env['LD'] = toolchain + '/bin/ld'
+    env['RANLIB'] = toolchain + '/bin/llvm-ranlib'
+    env['STRIP'] = toolchain + '/bin/llvm-strip'
+
     env['OBJSUFFIX'] = '.o'
     env['SHOBJSUFFIX'] = SCons.Util.CLVar('$OBJSUFFIX')
     env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME'] = 1
@@ -434,6 +435,11 @@ cpp_library = 'libgodot-cpp.{}.{}.{}'.format(env['platform'], env['target'], arc
 env.Append(CPPPATH=['.', godot_headers_path, cpp_bindings_path + 'include/', cpp_bindings_path + 'include/core/', cpp_bindings_path + 'include/gen/'])
 env.Append(LIBPATH=[cpp_bindings_path + 'bin/'])
 env.Append(LIBS=[cpp_library])
+
+# dict = env.Dictionary()
+# keys = dict.keys()
+# for key in keys:
+#     print ("construction variable = '%s', value = '%s'" % (key, dict[key]))
 
 # Sources to compile
 sources = []
