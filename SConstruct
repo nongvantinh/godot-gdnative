@@ -443,7 +443,12 @@ env.Append(LIBS=[cpp_library])
 
 # Sources to compile
 sources = []
-add_sources(sources, 'src', 'cpp')
+for root, dirs, files in os.walk('src'):
+    root = root.replace('\\', '/')
+    for file in files:
+        if file.endswith('.cpp') or file.endswith('.c'):
+            sources.append(root + '/' + file)
+
 
 library = env.SharedLibrary(
     target='demo/bin/{}_{}/'.format(env['platform'], arch_suffix)
