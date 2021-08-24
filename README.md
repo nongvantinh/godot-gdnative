@@ -51,3 +51,5 @@ or pass it when you calling scons:
 `scons generate_bindings=yes -j16 platform=android android_arch=**armv7** ANDROID_NDK_ROOT="/PATH-TO-ANDROID-NDK/" `
 
 run **scons -h** or look at SConstruct file for more information.
+#Development advice
+- One thing to remember: Never use Godot class outside your GDClass, because editor haven't loaded until it initialize.
