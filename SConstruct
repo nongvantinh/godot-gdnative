@@ -13,6 +13,10 @@ else:
     import codecs
     def decode_utf8(x):
         return codecs.utf_8_decode(x)[0]
+# Settings
+project_name = "demo"
+exclusive_folders = ["modules"]
+include_paths = []
 
 # Workaround for MinGW. See:
 # http://www.scons.org/wiki/LongCmdLinesOnWin32
@@ -433,6 +437,7 @@ cpp_bindings_path = "godot-cpp/"
 cpp_library = 'libgodot-cpp.{}.{}.{}'.format(env['platform'], env['target'], arch_suffix)
 
 env.Append(CPPPATH=['./', 'src/', godot_headers_path, cpp_bindings_path + 'include/', cpp_bindings_path + 'include/core/', cpp_bindings_path + 'include/gen/'])
+env.Append(CPPPATH=include_paths) # Custom include paths.
 env.Append(LIBPATH=[cpp_bindings_path + 'bin/'])
 env.Append(LIBS=[cpp_library])
 
@@ -441,17 +446,24 @@ env.Append(LIBS=[cpp_library])
 # for key in keys:
 #     print ("construction variable = '%s', value = '%s'" % (key, dict[key]))
 
+
+import re
 # Sources to compile
 sources = []
 for root, dirs, files in os.walk('src'):
     root = root.replace('\\', '/')
-    for file in files:
-        if file.endswith('.cpp') or file.endswith('.c'):
-            sources.append(root + '/' + file)
+    for ignored in exclusive_folders:
+        if bool(re.search(ignored + "*", root)):
+            break
+        else :
+            for file in files:
+                if file.endswith('.cpp') or file.endswith('.c'):
+                    sources.append(root + '/' + file)
+            break
 
 
 library = env.SharedLibrary(
-    target='demo/bin/{}_{}/'.format(env['platform'], arch_suffix)
+    target= project_name + '/bin/{}_{}/'.format(env['platform'], arch_suffix)
     + 'libgdnative.{}.{}{}'.format(env['platform'], arch_suffix, env['SHLIBSUFFIX']
     ), source=sources
 )
