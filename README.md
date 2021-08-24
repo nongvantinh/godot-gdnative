@@ -51,5 +51,7 @@ or pass it when you calling scons:
 `scons generate_bindings=yes -j16 platform=android android_arch=**armv7** ANDROID_NDK_ROOT="/PATH-TO-ANDROID-NDK/" `
 
 run **scons -h** or look at SConstruct file for more information.
-#Development advice
+# Development advice
 - One thing to remember: Never use Godot class outside your GDClass, because editor haven't loaded until it initialize.
+- Example Enet created in [GDNative Godot 3.3.2](https://github.com/nongvantinh/godot-gdnative/files/7036955/gopet-cpp.zip)
+
